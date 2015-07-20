@@ -1,0 +1,43 @@
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'application'
+mainClassName = 'Executer'
+compileJava.options.encoding = 'UTF-8'
+
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation"
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'KonkaImporter',
+            'Implementation-Version': '1.0',
+            'Main-Class': 'Executer'
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    copy {
+        from "src/main/resources/database.conf"
+        into "build/libs/"
+    }
+}
+
+configurations {
+    compile.exclude module: "commons-logging"
+    providedRuntime
+    providedCompile
+}
+
+dependencies {
+    compile 'mysql:mysql-connector-java:5.1.33'
+    compile 'commons-lang:commons-lang:2.6'
+    compile 'jdom:jdom:1.1'
+}
